@@ -1,0 +1,26 @@
+# Ignore compiled object files
+bin/*.o
+
+# Ignore static libraries
+libcutils.a
+
+# Ignore executables (if any)
+bin/*.exe
+bin/*.out
+bin/*.bin
+
+# Ignore temporary files and editor backups
+*~
+*.swp
+*.bak
+
+# Ignore dependency or log files (if used)
+*.d
+*.log
+
+# Ignore build directories (if generated)
+build/
+dist/
+
+# Ignore .vscode configuration (optional, if you use it)
+.vscode/
