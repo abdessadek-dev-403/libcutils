@@ -9,6 +9,9 @@ bin/*.exe
 bin/*.out
 bin/*.bin
 
+# Ignore .env
+.env
+
 # Ignore temporary files and editor backups
 *~
 *.swp

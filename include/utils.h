@@ -3,6 +3,10 @@
 
 // elog dependencies
 #define MAX_ERRNO_MESSAGE_LEN 40
+#define DOTENV_PATH ".env"
+#define ENV_MAX_LEN 1024
+#define SUCCESS 0
+
 enum ErrnoValue {
     OPERATION_NOT_PERMITTED = 1,
     NO_SUCH_FILE_OR_DIRECTORY,
@@ -43,5 +47,27 @@ typedef struct Errno {
  * ```
  */
 void log_errno(const char *prefix, int value);
+
+/**
+ * Retrieves the value of an environment variable from a .env file.
+ * 
+ * The .env file is expected to have lines in the format NAME=VALUE.
+ * The function searches for the provided NAME and returns its corresponding
+ * value as a dynamically allocated string. The caller is responsible for freeing
+ * the returned string.
+ * 
+ * @param name The name of the environment variable to search for.
+ * 
+ * @return A pointer to a dynamically allocated string containing the value,
+ *         or NULL if the variable is not found or an error occurs.
+ */
+char *dotenv_get(const char *name);
+
+/**
+ * Checks if the .env file exists.
+ * 
+ * @return 0 (SUCCESS) if the file exists, or an appropriate errno value if an error occurs.
+ */
+int check_dotenv_existance();
 
 #endif /* UTILS_H */

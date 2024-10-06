@@ -2,6 +2,7 @@
 #include <utils.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 /**
  * Helper function for `log_errno` to get the err structure
@@ -60,4 +61,48 @@ void log_errno(const char *prefix, int value) {
     } else {
         printf("%s: Unknown error code: %d\n", prefix, value);
     }
+}
+
+int check_dotenv_existance() {
+    errno = 0;
+    FILE *dotenv = fopen(DOTENV_PATH, "r");
+    if (dotenv == NULL)
+        return errno;
+    fclose(dotenv);
+    return SUCCESS;
+}
+
+char *dotenv_get(const char *name) {
+    char env_line[ENV_MAX_LEN];
+    FILE *dotenv = fopen(DOTENV_PATH, "r");
+    if (dotenv == NULL) 
+        return NULL;
+
+    while (fgets(env_line, ENV_MAX_LEN, dotenv)) {
+        // Remove trailing newline if present
+        env_line[strcspn(env_line, "\n")] = '\0';
+
+        // Find the first '=' in the line
+        char *equal_sign = strchr(env_line, '=');
+        if (equal_sign != NULL) {
+            // Split the line into key and value
+            *equal_sign = '\0';
+            char *key = env_line;
+            char *value = equal_sign + 1;
+
+            // If the key matches the requested name, return the value
+            if (strcmp(key, name) == 0) {
+                fclose(dotenv);
+
+                // Allocate memory for the value and return it
+                char *result = malloc(strlen(value) + 1);
+                if (result != NULL) {
+                    strcpy(result, value);
+                }
+                return result;
+            }
+        }
+    }
+    fclose(dotenv);
+    return NULL;
 }
