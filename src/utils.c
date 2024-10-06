@@ -48,25 +48,7 @@ Errno *getErrno(int value) {
     return NULL; // Error not found
 }
 
-/**
- * Logs the error message corresponding to a given errno value.
- * 
- * This function takes an error code (errno value) and logs the corresponding 
- * error message with an optional prefix. If the prefix is `NULL`, it defaults 
- * to "Error". If the provided errno value does not correspond to a known error 
- * code, the function logs an unknown error message.
- * 
- * @param prefix A pointer to a string used as a prefix in the logged message. 
- *               If `NULL`, it defaults to "Error".
- * @param value The errno code, representing the type of error.
- * 
- * Example:
- * 
- * ```
- * log_errno(NULL, 2);   // Outputs: "Error: No such file or directory"
- * log_errno("Warning", 12);  // Outputs: "Warning: Out of memory"
- * ```
- */
+
 void log_errno(const char *prefix, int value) {
     if (prefix == NULL)
         prefix = "Error";
