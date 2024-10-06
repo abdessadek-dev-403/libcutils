@@ -49,7 +49,7 @@ log_errno function:
 #include "path_to_libcutils/include/utils.h"
 
 int main() {
-    log_error_message("Warning", 2);  // Logs: "Warning: No such file or directory"
+    log_errno("Warning", 2);  // Logs: "Warning: No such file or directory"
     return 0;
 }
 ```
