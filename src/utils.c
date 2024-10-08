@@ -174,8 +174,17 @@ int dotenv_set(const char *key, unsigned char *value) {
 
     if (!key_found) {
         // Handle the case when the key is not found, either return an error or add it to envs
-        free(envs);
-        return -1;  // For now, we'll return an error if the key is not found
+        Dotenv *temp = realloc(envs, (size_envs + 1) * sizeof(Dotenv));
+        if (temp ==NULL) {
+            free(envs);
+            return -1;
+        }
+        envs = temp;
+        strncpy(envs[size_envs].key, key, MAX_KEY_LEN - 1);
+        envs[size_envs].key[MAX_KEY_LEN - 1] = '\0';
+        strncpy(envs[size_envs].value, (char*)value, MAX_VALUE_LEN - 1);
+        envs[size_envs].value[MAX_VALUE_LEN - 1] = '\0';
+        size_envs++;
     }
 
     FILE *dotenv = fopen(DOTENV_PATH, "w");
@@ -194,5 +203,5 @@ int dotenv_set(const char *key, unsigned char *value) {
     
     fclose(dotenv);
     free(envs);
-    return 0;
+    return SUCCESS;
 }

@@ -77,8 +77,31 @@ typedef struct Dotenv {
     char value[MAX_VALUE_LEN];
 } Dotenv;
 
+/**
+ * Sets a variable in .env file or add new one if it doesn't exist.
+ * 
+ * @param key The name of the environment variable to set
+ * @param value The value of the key
+ * 
+ * @return 0 (`SUCCESS`) if the environement variable has been set successfuly.
+ */
 int dotenv_set(const char *key,unsigned char *value);
+
+/**
+ * Loads environment variable into an array.
+ * 
+ * @param envs An array pointer to store environment vars and its values
+ * @param size_envs the size of envs
+ * 
+ * @return `0` if loads envs successufly or `-1` if an error occurs.
+ */
 int load_env(Dotenv **envs, size_t *size_envs);
+
+/**
+ * Counts how many line or how many env vars store in `.env` file.
+ * 
+ * @return The number (`size_t`) of lines at `.env` file.
+ */
 size_t count_envs();
 
 
