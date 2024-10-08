@@ -70,4 +70,16 @@ char *dotenv_get(const char *name);
  */
 int check_dotenv_existance();
 
+#define MAX_KEY_LEN 50
+#define MAX_VALUE_LEN 255
+typedef struct Dotenv {
+    char key[MAX_KEY_LEN];
+    char value[MAX_VALUE_LEN];
+} Dotenv;
+
+int dotenv_set(const char *key,unsigned char *value);
+int load_env(Dotenv **envs, size_t *size_envs);
+size_t count_envs();
+
+
 #endif /* UTILS_H */

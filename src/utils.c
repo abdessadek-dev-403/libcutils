@@ -104,5 +104,95 @@ char *dotenv_get(const char *name) {
         }
     }
     fclose(dotenv);
+
     return NULL;
+}
+
+size_t count_envs() {
+    char env_line[ENV_MAX_LEN];
+    FILE *dotenv = fopen(DOTENV_PATH, "r");
+    if (dotenv == NULL) 
+        return (size_t)-1;  // return an invalid size value if fopen fails
+
+    size_t count = 0;
+    while (fgets(env_line, ENV_MAX_LEN, dotenv)) 
+        count++;
+    
+    fclose(dotenv);
+    return count;
+}
+
+int load_env(Dotenv **envs, size_t *size_envs) {
+    char env_line[ENV_MAX_LEN];
+    FILE *dotenv = fopen(DOTENV_PATH, "r");
+    if (dotenv == NULL) 
+        return -1;
+    
+    size_t index = 0;
+    while (index < *size_envs && fgets(env_line, ENV_MAX_LEN, dotenv)) {
+        env_line[strcspn(env_line, "\n")] = '\0';  // remove newline character
+
+        char *equal_sign = strchr(env_line, '=');
+        if (equal_sign != NULL) {
+            *equal_sign = '\0';  // split key and value
+            char *key = env_line;
+            char *value = equal_sign + 1;
+
+            // Ensure memory boundaries are respected
+            strncpy((*envs)[index].key, key, MAX_KEY_LEN - 1);
+            (*envs)[index].key[MAX_KEY_LEN - 1] = '\0';  // null-terminate
+            
+            strncpy((*envs)[index].value, value, MAX_VALUE_LEN - 1);
+            (*envs)[index].value[MAX_VALUE_LEN - 1] = '\0';  // null-terminate
+            index++;
+        }
+    }
+    fclose(dotenv);
+    return 0;
+}
+
+int dotenv_set(const char *key, unsigned char *value) {
+    size_t size_envs = count_envs();
+    if (size_envs == (size_t)-1)
+        return -1;  // Failed to open the .env file or no env variables found
+
+    Dotenv *envs = malloc(size_envs * sizeof(Dotenv));
+    if (envs == NULL)
+        return -1;  // Memory allocation failed
+
+    load_env(&envs, &size_envs);
+
+    int key_found = 0;
+    for (size_t i = 0; i < size_envs; i++) {
+        if (strcmp(envs[i].key, key) == 0) {
+            strncpy(envs[i].value, (char*)value, MAX_VALUE_LEN - 1);
+            envs[i].value[MAX_VALUE_LEN - 1] = '\0';  // Ensure null-termination
+            key_found = 1;
+            break;
+        }
+    }
+
+    if (!key_found) {
+        // Handle the case when the key is not found, either return an error or add it to envs
+        free(envs);
+        return -1;  // For now, we'll return an error if the key is not found
+    }
+
+    FILE *dotenv = fopen(DOTENV_PATH, "w");
+    if (dotenv == NULL) {
+        free(envs);
+        return -1;
+    }
+
+    for (size_t i = 0; i < size_envs; i++) {
+        if (fprintf(dotenv, "%s=%s\n", envs[i].key, envs[i].value) < 0) {
+            fclose(dotenv);
+            free(envs);
+            return -1;  // Error writing to file
+        }
+    }
+    
+    fclose(dotenv);
+    free(envs);
+    return 0;
 }
